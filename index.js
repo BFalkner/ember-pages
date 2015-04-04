@@ -2,17 +2,26 @@
 'use strict';
 
 var Funnel = require('broccoli-funnel'),
-    MarkdownFilter = require('./lib/filters/markdown');
+    Markdown = require('./lib/compilers/markdown'),
+    FrontMatter = require('./lib/compilers/front-matter');
 
 module.exports = {
   name: 'ember-pages',
 
+  treeForApp: function() {
+    return new FrontMatter(this._pagesTree());
+  },
+
   treeForPublic: function() {
-    return new MarkdownFilter(new Funnel(this.app.trees.app, {
+    return new Markdown(this._pagesTree());
+  },
+
+  _pagesTree: function() {
+    return new Funnel(this.app.trees.app, {
       srcDir: '/pages',
       include: ['**/*.md'],
       destDir: '/pages',
       allowEmpty: true
-    }));
+    });
   }
 };
