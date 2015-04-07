@@ -3,7 +3,8 @@
 
 var Funnel = require('broccoli-funnel'),
     Markdown = require('./lib/compilers/markdown'),
-    FrontMatter = require('./lib/compilers/front-matter');
+    FrontMatter = require('./lib/compilers/front-matter'),
+    Trim = require('./lib/compilers/trim-front-matter');
 
 module.exports = {
   name: 'ember-pages',
@@ -13,7 +14,7 @@ module.exports = {
   },
 
   treeForPublic: function() {
-    return new Markdown(this._pagesTree());
+    return new Markdown(new Trim(this._pagesTree()));
   },
 
   _pagesTree: function() {
