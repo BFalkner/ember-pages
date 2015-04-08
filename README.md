@@ -1,4 +1,4 @@
-# Ember-pages
+# Ember-pages [![Build Status](https://travis-ci.org/BFalkner/ember-pages.svg)](https://travis-ci.org/BFalkner/ember-pages)
 
 This README outlines the details of collaborating on this Ember addon.
 
