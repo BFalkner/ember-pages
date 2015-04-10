@@ -4,7 +4,7 @@ import {
   test
 } from 'qunit';
 import startApp from 'dummy/tests/helpers/start-app';
-import metaData from 'dummy/pages/meta-data';
+import metaData from 'ember-pages/pages/meta-data';
 
 var application;
 
