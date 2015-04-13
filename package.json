@@ -23,6 +23,7 @@
     "broccoli-filter": "0.1.12",
     "broccoli-funnel": "0.2.2",
     "broccoli-merge-trees": "0.2.1",
+    "camelize": "1.0.0",
     "ember-cli": "0.2.2",
     "ember-cli-app-version": "0.3.3",
     "ember-cli-content-security-policy": "0.4.0",
