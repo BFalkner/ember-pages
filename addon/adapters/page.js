@@ -8,22 +8,26 @@ var classify = Ember.String.classify,
     pluralize = Ember.String.pluralize,
     fmt = Ember.String.fmt;
 
+function fetch(data, id) {
+  return Ember.$.ajax(data.url).then(function(res) {
+      data.id = id;
+      data.body = res;
+      return data;
+  }, function(jqXHR) {
+    jqXHR.then = null;
+    return jqXHR;
+  });
+}
+
 export default DS.Adapter.extend({
   find: function(store, type, id /*, snapshot */) {
     var data = metaData.pages[pluralize(type.typeKey)][id];
 
     return new Ember.RSVP.Promise(function(resolve, reject) {
       if (data) {
-        data.id = id;
-        Ember.$.ajax(data.url).then(function(res) {
-          Ember.run(function() {
-            data.body = res;
-            resolve(data);
-          });
-        }, function(jqXHR) {
-          jqXHR.then = null;
-          Ember.run(null, reject, jqXHR);
-        });
+        fetch(data, id).then(
+          function(record) { Ember.run(null, resolve, record); },
+          function(failure) { Ember.run(null, reject, failure); });
       } else { reject(); }
     });
   },
@@ -44,8 +48,19 @@ export default DS.Adapter.extend({
     throw new Ember.Error("Deletion is not supported by PageAdapter");
   },
 
-  findAll: function(/* store, type, sinceToken */) {
+  findAll: function(store, type /*, sinceToken */) {
+    var allData = metaData.pages[pluralize(type.typeKey)];
 
+    return new Ember.RSVP.Promise(function(resolve, reject) {
+      if (allData) {
+        Ember.RSVP.all(allData.map(function(data, id) {
+          return fetch(data, id);
+        })).then(
+          function(records) { Ember.run(null, resolve, records); },
+          function() { Ember.run(null, reject); }
+        );
+      } else { reject(); }
+    });
   },
 
   findQuery: function(/* store, type, query */) {
