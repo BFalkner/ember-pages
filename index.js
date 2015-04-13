@@ -4,13 +4,17 @@
 var Funnel = require('broccoli-funnel'),
     Markdown = require('./lib/compilers/markdown'),
     FrontMatter = require('./lib/compilers/front-matter'),
-    Trim = require('./lib/compilers/trim-front-matter');
+    Trim = require('./lib/compilers/trim-front-matter'),
+    mergeTrees = require('broccoli-merge-trees');
 
 module.exports = {
   name: 'ember-pages',
 
-  treeForApp: function() {
-    return new FrontMatter(this._pagesTree());
+  treeForAddon: function(tree) {
+    var frontMatter = new FrontMatter(this._pagesTree()),
+        combinedTree = mergeTrees([tree, frontMatter]);
+
+    return this._super.treeForAddon.call(this, combinedTree);
   },
 
   treeForPublic: function() {
