@@ -20,16 +20,16 @@ function fetch(data, id) {
 }
 
 export default DS.Adapter.extend({
-  find: function(store, type, id /*, snapshot */) {
+  find(store, type, id /*, snapshot */) {
     var data = metaData.pages[pluralize(type.typeKey)][id];
 
-    return new Ember.RSVP.Promise(function(resolve, reject) {
-      if (data) {
+    return new Ember.RSVP.Promise((resolve, reject) =>
+      data ?
         fetch(data, id).then(
-          function(record) { Ember.run(null, resolve, record); },
-          function(failure) { Ember.run(null, reject, failure); });
-      } else { reject(); }
-    });
+          (record) => Ember.run(null, resolve, record),
+          (failure) => Ember.run(null, reject, failure))
+      : reject()
+    );
   },
 
   createRecord: function(store, type /*, snapshot */) {
@@ -48,19 +48,17 @@ export default DS.Adapter.extend({
     throw new Ember.Error("Deletion is not supported by PageAdapter");
   },
 
-  findAll: function(store, type /*, sinceToken */) {
+  findAll(store, type /*, sinceToken */) {
     var allData = metaData.pages[pluralize(type.typeKey)];
 
-    return new Ember.RSVP.Promise(function(resolve, reject) {
-      if (allData) {
-        Ember.RSVP.all(allData.map(function(data, id) {
-          return fetch(data, id);
-        })).then(
-          function(records) { Ember.run(null, resolve, records); },
-          function() { Ember.run(null, reject); }
-        );
-      } else { reject(); }
-    });
+    return new Ember.RSVP.Promise((resolve, reject) =>
+      allData ?
+        Ember.RSVP.all(allData.map((data, id) => fetch(data, id)))
+        .then(
+          (records) => Ember.run(null, resolve, records),
+          () => Ember.run(null, reject))
+      : reject()
+    );
   },
 
   findQuery: function(/* store, type, query */) {
