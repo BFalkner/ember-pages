@@ -4,22 +4,45 @@ This README outlines the details of collaborating on this Ember addon.
 
 ## Installation
 
-* `git clone` this repository
-* `npm install`
-* `bower install`
+* `ember install ember-pages`
 
-## Running
+## Usage
 
-* `ember server`
-* Visit your app at http://localhost:4200.
+### Create a model with a body property
 
-## Running Tests
+    import DS from 'ember-data';
 
-* `ember test`
-* `ember test --server`
+    export default DS.Model.extend({
+      title: DS.attr('string'),
+      description: DS.attr('string'),
+      body: DS.attr('string')
+    });
 
-## Building
+### Set the adapter for your model
 
-* `ember build`
+    import PageAdapter from 'ember-pages/adapters/page';
 
-For more information on using ember-cli, visit [http://www.ember-cli.com/](http://www.ember-cli.com/).
+    export default PageAdapter.extend({
+
+    });
+
+### Generate some static data
+
+* `ember generate page blogPost title:"Title is required" description:"Set your model property values"`
+
+### Edit your data with markdown
+
+    ---
+    title: Title is required
+    description: Set your model property values
+    ---
+    Hello from app/pages/blog-posts/title-is-required.md
+
+### That's it!
+
+    > post = $E.store.find("blogPost", 0)
+    h {__nextSuper: undefined, __ember1430412616372: null, __ember_meta__: Object, constructor: function, _super: function…}
+    > post.get('title')
+    "Title is required"
+    > post.get('body')
+    "<p>Hello from app/pages/blog-posts/title-is-required.md</p>"
