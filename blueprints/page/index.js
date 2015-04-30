@@ -1,7 +1,8 @@
 var stringUtils = require('ember-cli/lib/utilities/string'),
     SilentError = require('ember-cli/lib/errors/silent'),
     EOL = require('os').EOL,
-    _ = require('lodash');
+    _ = require('lodash'),
+    inflection = require('inflection');
 
 module.exports = {
   description: 'Creates a static page.',
@@ -18,18 +19,18 @@ module.exports = {
           return stringUtils.dasherize(pair[0]) + ": " + pair[1];
         })
         .join(EOL),
-      title: options.entity.options.title
+      name: stringUtils.dasherize(options.entity.options.title),
+      type: inflection.pluralize(stringUtils.dasherize(options.entity.name))
     };
   },
 
   fileMapTokens: function() {
     return {
       __type__: function(options) {
-        return options.dasherizedModuleName;
+        return options.locals.type;
       },
       __name__: function(options) {
-        var title = options.locals.title;
-        return stringUtils.dasherize(title);
+        return options.locals.name;
       }
     };
   }
