@@ -9,8 +9,8 @@ module.exports = {
 
   locals: function(options) {
     if (options.entity.options.title === undefined)
-      throw new SilentError("Title is required. ex: `ember generate page "
-                            + options.entity.name + ' title:"My Title"`');
+      throw new SilentError("Title is required. ex: `ember generate page " +
+                                options.entity.name + ' title:"My Title"`');
 
     return {
       attrs: _(options.entity.options)
@@ -34,4 +34,4 @@ module.exports = {
       }
     };
   }
-}
+};
