@@ -1,4 +1,4 @@
-# Ember-pages [![Build Status](https://travis-ci.org/BFalkner/ember-pages.svg)](https://travis-ci.org/BFalkner/ember-pages) [![Ember Observer Score](http://emberobserver.com/badges/ember-pages.svg)](http://emberobserver.com/addons/ember-pages)
+# Ember-pages [![Build Status](https://travis-ci.org/BFalkner/ember-pages.svg)](https://travis-ci.org/BFalkner/ember-pages) [![Code Climate](https://codeclimate.com/github/BFalkner/ember-pages/badges/gpa.svg)](https://codeclimate.com/github/BFalkner/ember-pages) [![Ember Observer Score](http://emberobserver.com/badges/ember-pages.svg)](http://emberobserver.com/addons/ember-pages)
 
 ## Installation
 
