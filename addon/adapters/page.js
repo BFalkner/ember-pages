@@ -21,7 +21,7 @@ function fetch(data, id) {
 
 export default DS.Adapter.extend({
   find(store, type, id /*, snapshot */) {
-    var data = metaData.pages[pluralize(type.typeKey)][id];
+    var data = this._dataForType(type)[id];
 
     return new Ember.RSVP.Promise((resolve, reject) =>
       data ?
@@ -36,7 +36,7 @@ export default DS.Adapter.extend({
     var classesName = pluralize(classify(type.typeKey)),
         typeName = dasherize(type.typeKey);
 
-    Ember.assert(fmt("Create new %@ using `ember generate page %@ <name>`", classesName, typeName));
+    Ember.assert(fmt("Create new %@ using `ember generate page %@ title:<name>`", classesName, typeName));
     throw new Ember.Error("Creation is not supported by PageAdapter");
   },
 
@@ -49,7 +49,7 @@ export default DS.Adapter.extend({
   },
 
   findAll(store, type /*, sinceToken */) {
-    var allData = metaData.pages[pluralize(type.typeKey)];
+    var allData = this._dataForType(type);
 
     return new Ember.RSVP.Promise((resolve, reject) =>
       allData ?
@@ -61,7 +61,24 @@ export default DS.Adapter.extend({
     );
   },
 
-  findQuery: function(/* store, type, query */) {
+  findQuery: function(store, type, query) {
+    const queryArray = this._queryArray(query),
+          data = this._dataForType(type),
+          selected = Ember.A(data)
+            .filter((record) => queryArray.every(q => record[q[0]] === q[1]));
 
+    return Ember.RSVP.all(selected.map((data, id) => fetch(data, id)));
+  },
+
+  _dataForType(type) {
+    return metaData.pages[pluralize(type.typeKey)];
+  },
+
+  _queryArray(query) {
+    var ret = [];
+    for (var key in query) {
+      ret.push([key, query[key]]);
+    }
+    return ret;
   }
 });
