@@ -37,6 +37,9 @@ test('Store#find/2 with id', function(assert){
 test('Store#find/2 with query', function(assert){
   stop();
   Ember.run(() => this.store.find('blogPost', { title: "Front Matter Test" }))
-  .then(posts => assert.equal(posts.get('length'), 1))
+  .then(({content: [post]}) => {
+    assert.equal(post.get('title'), "Front Matter Test");
+    assert.equal(post.get('id'), '1', "id is correct");
+  })
   .finally(start);
 });

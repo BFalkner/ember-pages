@@ -1,31 +1,20 @@
 import DS from 'ember-data';
 import Ember from 'ember';
 
-import metaData from 'ember-pages/pages/meta-data';
-
 var classify = Ember.String.classify,
     dasherize = Ember.String.dasherize,
     pluralize = Ember.String.pluralize,
     fmt = Ember.String.fmt;
 
-function fetch(data, id) {
-  return Ember.$.ajax(data.url).then(function(res) {
-      data.id = id;
-      data.body = res;
-      return data;
-  }, function(jqXHR) {
-    jqXHR.then = null;
-    return jqXHR;
-  });
-}
-
 export default DS.Adapter.extend({
+  metaData: Ember.inject.service('pages-meta-data'),
+
   find(store, type, id /*, snapshot */) {
     var data = this._dataForType(type)[id];
 
     return new Ember.RSVP.Promise((resolve, reject) =>
       data ?
-        fetch(data, id).then(
+        this._fetch(data).then(
           (record) => Ember.run(null, resolve, record),
           (failure) => Ember.run(null, reject, failure))
       : reject()
@@ -53,7 +42,7 @@ export default DS.Adapter.extend({
 
     return new Ember.RSVP.Promise((resolve, reject) =>
       allData ?
-        Ember.RSVP.all(allData.map((data, id) => fetch(data, id)))
+        Ember.RSVP.all(allData.map((data) => this._fetch(data)))
         .then(
           (records) => Ember.run(null, resolve, records),
           () => Ember.run(null, reject))
@@ -62,22 +51,41 @@ export default DS.Adapter.extend({
   },
 
   findQuery: function(store, type, query) {
-    const queryArray = this._queryArray(query),
+    const queries = this._pairs(query),
           data = this._dataForType(type),
           selected = Ember.A(data)
-            .filter((record) => queryArray.every(q => record[q[0]] === q[1]));
+            .filter((record) => queries.every(q => record[q[0]] === q[1]));
 
-    return Ember.RSVP.all(selected.map((data, id) => fetch(data, id)));
+    return Ember.RSVP.all(selected.map((data) => this._fetch(data)));
+  },
+
+  _fetch(data) {
+    var d = this._copyObj(data);
+    return Ember.$.ajax(d.url).then(function(res) {
+        d.body = res;
+        return d;
+    }, function(jqXHR) {
+      jqXHR.then = null;
+      return jqXHR;
+    });
   },
 
   _dataForType(type) {
-    return metaData.pages[pluralize(type.typeKey)];
+    return this.get(`metaData.pages.${pluralize(type.typeKey)}`);
   },
 
-  _queryArray(query) {
+  _pairs(obj) {
     var ret = [];
-    for (var key in query) {
-      ret.push([key, query[key]]);
+    for (var key in obj) {
+      ret.push([key, obj[key]]);
+    }
+    return ret;
+  },
+
+  _copyObj(obj) {
+    var ret = {};
+    for (var key in obj) {
+      ret[key] = obj[key];
     }
     return ret;
   }
